@@ -16,25 +16,25 @@
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="ChatServer.cpp">
+    <ClCompile Include="Server.cpp">
       <Filter>Asio</Filter>
     </ClCompile>
-    <ClCompile Include="ServerSession.cpp">
-      <Filter>Temp</Filter>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Asio</Filter>
     </ClCompile>
-    <ClCompile Include="Protocol.cpp">
-      <Filter>Temp</Filter>
+    <ClCompile Include="Session.cpp">
+      <Filter>Asio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChatServer.h">
+    <ClInclude Include="Server.h">
       <Filter>Asio</Filter>
     </ClInclude>
-    <ClInclude Include="ServerSession.h">
-      <Filter>Temp</Filter>
+    <ClInclude Include="SessionManager.h">
+      <Filter>Asio</Filter>
     </ClInclude>
-    <ClInclude Include="Protocol.h">
-      <Filter>Temp</Filter>
+    <ClInclude Include="Session.h">
+      <Filter>Asio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

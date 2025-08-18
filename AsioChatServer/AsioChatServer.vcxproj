@@ -124,15 +124,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChatServer.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Protocol.cpp" />
-    <ClCompile Include="ServerSession.cpp" />
+    <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SessionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChatServer.h" />
-    <ClInclude Include="Protocol.h" />
-    <ClInclude Include="ServerSession.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="SessionManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
