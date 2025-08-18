@@ -13,11 +13,7 @@ int main()
 
 	// TODO 멀티스레드로 
 	io_context.run(); // 내부적으로 GetQueuedCompletionStatus() 실행 (io_context에 등록된 핸들러들을 실행)
-
-	while (true)
-	{
-
-	}
+	// 그리고 블로킹 함수이다.
 
 	return 0;
 }

@@ -7,7 +7,7 @@ SessionManager::SessionManager(boost::asio::io_context& io_context, Server* pSer
 
 SessionManager::~SessionManager()
 {
-	for (auto i : clientList)
+	for (auto i : sessionList)
 	{
 		delete i.second;
 	}
@@ -17,21 +17,21 @@ Session* SessionManager::CreateSession()
 {
 	int thisSessionNo = sessionNo.fetch_add(1);
 	Session* pSession = new Session(m_ioContext, serverSession, thisSessionNo);
-	clientList[thisSessionNo] = pSession;
+	sessionList[thisSessionNo] = pSession;
 	return pSession;
 }
 
 bool SessionManager::CloseSession(int no)
 {
-	if (clientList[no] == nullptr) return true;
+	if (sessionList[no] == nullptr) return true;
 
-	delete clientList[no];
-	clientList[no] = nullptr;
+	delete sessionList[no];
+	sessionList[no] = nullptr;
 	return true;
 }
 
 Session* SessionManager::GetSession(int no)
 {
-	Session* pSession = clientList[no];
+	Session* pSession = sessionList[no];
 	return pSession;
 }

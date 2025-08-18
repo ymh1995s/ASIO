@@ -27,5 +27,5 @@ private:
 	boost::asio::io_context& m_ioContext;
 	Server* serverSession;
 	atomic<int> sessionNo;
-	map<int, Session*> clientList;
+	map<int, Session*> sessionList;
 };

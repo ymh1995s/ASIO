@@ -7,7 +7,6 @@ Session::Session(boost::asio::io_context& io_context, Server* pServer, int sessi
 	, m_pServer(pServer)
 	, m_sessionID(sessionID)
 {
-	Init();
 }
 
 Session::~Session()
