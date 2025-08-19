@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <deque>
+#include <queue>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -11,23 +11,34 @@ class Server;
 class Session
 {
 public:
-	Session(boost::asio::io_context& io_context, Server* pServer, int sessionID);
+	Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID);
 	~Session();
 
 	void Init();
-	void PostReceive();
-	int GetSessionID() { return m_sessionID; };
 
+	void PostReceive();
+	void PostSend(char* buffer, int nSize);
+
+	// Heleper
+	int GetSessionID() { return m_sessionID; };
 	boost::asio::ip::tcp::socket& Socket() { return m_Socket; }
 
 private:
-	void handle_receive(const boost::system::error_code& error, size_t bytes_transferred);
+	void HandleReceive(const boost::system::error_code& error, int bytes_transferred);
+	void HandleSend(const boost::system::error_code& error, int bytes_transferred);
+	void DoSend();
 
 private:
 	boost::asio::ip::tcp::socket m_Socket;
-	Server* m_pServer;
+	shared_ptr<Server> m_pServer;
 	int m_sessionID;
 
 public:
-	int m_recvBuffer[1024];
+	char m_recvBuffer[1024];
+	queue<pair<char*, int>> m_sendQueue; // TODO 스마트포인터로 관리 
+	atomic<bool> m_isSending = false;
+		
+private:
+	std::mutex m_lock;
+	bool m_bClosed = false;
 };

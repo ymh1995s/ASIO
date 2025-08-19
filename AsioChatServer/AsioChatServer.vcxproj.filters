@@ -8,7 +8,7 @@
     <Filter Include="Asio">
       <UniqueIdentifier>{d52bdba4-60f3-4ea1-aa61-8c22da1da207}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Temp">
+    <Filter Include="Buffer">
       <UniqueIdentifier>{727abbc1-d9a7-4091-b7ba-9e1b7268ad4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -25,6 +25,9 @@
     <ClCompile Include="Session.cpp">
       <Filter>Asio</Filter>
     </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="Session.h">
       <Filter>Asio</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Buffer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

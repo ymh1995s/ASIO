@@ -5,15 +5,13 @@ Server::Server(boost::asio::io_context& io_context)
 	: m_ioContext(io_context),
 	m_acceptor(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 7777))
 {
-	Start(); // Start PostAccept
 }
 
 Server::~Server()
 {
-
 }
 
-void Server::Start()
+void Server::Init()
 {
 	std::cout << "서버 시작....." << std::endl;
 	CreateSessionManager();
@@ -22,13 +20,14 @@ void Server::Start()
 
 void Server::CreateSessionManager()
 {
-	sessionManager = new SessionManager(m_ioContext, this);
+	// shared_from_this()는 이미 관리되고 있는 객체, 즉 생성자 안에서는 호출할 수 없다.
+	sessionManager = make_shared<SessionManager>(m_ioContext, shared_from_this());
 }
 
 bool Server::PostAccept()
 {
 	// ASIO는 수립됐을 때 할당 받을 세션이 미리 준비돼 있어야만 한다.
-	Session* pSession = sessionManager->CreateSession();
+	shared_ptr<Session> pSession = sessionManager->CreateSession();
 
 	// async_accept(클라에 할당할 소켓 클래스, 접속이 완료됐을 때 콜백 함수)
 	m_acceptor.async_accept(pSession->Socket(),
@@ -42,7 +41,7 @@ bool Server::PostAccept()
 	return true;
 }
 
-void Server::handle_accept(Session* pSession, const boost::system::error_code& error)
+void Server::handle_accept(shared_ptr<Session> pSession, const boost::system::error_code& error)
 {
 	if (!error)
 	{

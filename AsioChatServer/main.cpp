@@ -9,7 +9,9 @@ int main()
 	// ex) ChatServer 클래스의 acceptor와 연결해야함
 	// ex) Session 클래스의 비동기 입출력을 위해 
 
-	Server server(io_context);
+	// 스택 객체는 shared_from_this를 사용할 수 없으므로 스마트 포인터로 사용
+	auto server = std::make_shared<Server>(io_context);
+	server->Init();
 
 	// TODO 멀티스레드로 
 	io_context.run(); // 내부적으로 GetQueuedCompletionStatus() 실행 (io_context에 등록된 핸들러들을 실행)

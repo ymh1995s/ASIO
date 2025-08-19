@@ -13,19 +13,19 @@
 using namespace std;
 class Session;
 
-class SessionManager
+class SessionManager 
 {
 public:
-	SessionManager(boost::asio::io_context& io_context, Server* pServer);
+	SessionManager(boost::asio::io_context& io_context, shared_ptr<Server> pServer);
 	~SessionManager();
 
-	Session* CreateSession();
+	shared_ptr<Session> CreateSession();
 	bool CloseSession(int no);
-	Session* GetSession(int no);
+	shared_ptr<Session> GetSession(int no);
 
 private:
 	boost::asio::io_context& m_ioContext;
-	Server* serverSession;
+	shared_ptr<Server> serverSession;
 	atomic<int> sessionNo;
-	map<int, Session*> sessionList;
+	map<int, shared_ptr<Session>> sessionList;
 };

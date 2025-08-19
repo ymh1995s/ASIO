@@ -9,7 +9,7 @@ const char SERVER_IP[] = "127.0.0.1";
 
 int main()
 {
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 	boost::asio::io_context io_context;
 
 	// boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(SERVER_IP), PORT_NUMBER); // deprecated
