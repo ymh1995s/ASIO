@@ -28,6 +28,9 @@
     <ClCompile Include="Buffer.cpp">
       <Filter>Buffer</Filter>
     </ClCompile>
+    <ClCompile Include="PacketManager.cpp">
+      <Filter>Buffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -40,6 +43,9 @@
       <Filter>Asio</Filter>
     </ClInclude>
     <ClInclude Include="Buffer.h">
+      <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketManager.h">
       <Filter>Buffer</Filter>
     </ClInclude>
   </ItemGroup>

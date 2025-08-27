@@ -26,7 +26,9 @@ public:
 private:
 	void HandleReceive(const boost::system::error_code& error, int bytes_transferred);
 	void HandleSend(const boost::system::error_code& error, int bytes_transferred);
-	void DoSend();
+
+	void Send();
+	void Broadcase();
 
 private:
 	boost::asio::ip::tcp::socket m_Socket;

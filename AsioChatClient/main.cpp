@@ -11,10 +11,7 @@ int main()
 {
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	boost::asio::io_context io_context;
-
-	// boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address::from_string(SERVER_IP), PORT_NUMBER); // deprecated
 	boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(SERVER_IP), 7777);
-
 	boost::system::error_code connect_error;
 	boost::asio::ip::tcp::socket socket(io_context);
 
@@ -43,7 +40,6 @@ int main()
 		socket.write_some(boost::asio::buffer(szMessage, nMsgLen), ignored_error);
 
 		std::cout << "서버에 보낸 메시지: " << szMessage << std::endl;
-
 
 		std::array<char, 128> buf;
 

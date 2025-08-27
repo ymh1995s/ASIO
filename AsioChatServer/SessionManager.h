@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <vector>
@@ -26,6 +26,8 @@ public:
 private:
 	boost::asio::io_context& m_ioContext;
 	shared_ptr<Server> serverSession;
-	atomic<int> sessionNo;
+	atomic<int> sessionNo; // 이번 세션에게 부여할 번호
+
+public:
 	map<int, shared_ptr<Session>> sessionList;
 };

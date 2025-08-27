@@ -51,10 +51,10 @@ void Session::PostSend(char* buffer, int nSize)
 	}
 	
 
-	DoSend();
+	Send();
 }
 
-void Session::DoSend()
+void Session::Send()
 {
 	// conster buffer
 		// ASIO에서 제공하는 읽기용 버퍼
@@ -87,11 +87,19 @@ void Session::DoSend()
 	);
 }
 
+void Session::Broadcase()
+{
+	for (auto s : m_pServer->sessionManager->sessionList)
+	{
+
+	}
+}
+
 void Session::HandleSend(const boost::system::error_code& error, int bytes_transferred)
 {
 	if (!error)
 	{
-		DoSend();
+		Send();
 	}
 	else
 	{
@@ -117,7 +125,7 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 		// TODO : 현재는 m_recvBuffer가 있으나 Buffer클래스에서 조립해서 사용하게 할거임
 		cout << " 무언가 수신했습니다 \n";
 
-		// TODO 삭제 
+		// TODO 조립
 		PostSend(m_recvBuffer, bytes_transferred);
 
 		PostReceive();
