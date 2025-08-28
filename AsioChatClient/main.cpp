@@ -4,7 +4,64 @@
 #include <thread>
 #include <chrono>
 
+using boost::asio::ip::tcp;
+
 const char SERVER_IP[] = "127.0.0.1";
+const int SERVER_PORT = 7777;
+
+class ChatClient
+{
+public:
+	ChatClient(boost::asio::io_context& io_context, tcp::endpoint& endpoint)
+		: m_socket(io_context)
+	{
+		m_socket.async_connect(endpoint,
+			// this => 값으로 캡쳐 
+			[this](boost::system::error_code ec)
+			{
+				if (!ec)
+				{
+					std::cout << "서버 연결 성공\n";
+					do_read();
+				}
+				else
+				{
+					std::cout << "연결 실패: " << ec.message() << "\n";
+				}
+			});
+	}
+
+	void send_message(std::shared_ptr<std::string> msg)
+	{
+		boost::asio::async_write(m_socket, boost::asio::buffer(*msg),
+			[msg](boost::system::error_code ec, std::size_t /*length*/)
+			{
+				if (ec)
+					std::cout << "송신 오류: " << ec.message() << "\n";
+			});
+	}
+
+private:
+	void do_read()
+	{
+		m_socket.async_read_some(boost::asio::buffer(recvBuffer, 1024),
+			[this](boost::system::error_code ec, std::size_t length)
+			{
+				if (!ec)
+				{
+					std::cout << "[서버] " << std::string(recvBuffer, length) << "\n";
+					do_read(); // 계속 읽기 등록
+				}
+				else
+				{
+					std::cout << "수신 오류: " << ec.message() << "\n";
+				}
+			});
+	}
+
+	tcp::socket m_socket;
+	char recvBuffer[1024];
+};
 
 
 int main()
@@ -12,67 +69,30 @@ int main()
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 	boost::asio::io_context io_context;
 	boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(SERVER_IP), 7777);
-	boost::system::error_code connect_error;
-	boost::asio::ip::tcp::socket socket(io_context);
 
-	socket.connect(endpoint, connect_error);
+	ChatClient client(io_context, endpoint);
 
-	if (connect_error)
-	{
-		std::cout << "연결 실패. error No: " << connect_error.value() << ", Message: " << connect_error.message() << std::endl;
-		getchar();
-		return 0;
-	}
-	else
-	{
-		std::cout << "서버에 연결 성공" << std::endl;
-	}
-
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	for (int i = 0; i < 7; ++i)
-	{
-		char szMessage[128] = { 0, };
-		sprintf_s(szMessage, 128 - 1, "%d - Send Message", i);
-		int nMsgLen = strnlen_s(szMessage, 128 - 1);
-
-		boost::system::error_code ignored_error;
-		socket.write_some(boost::asio::buffer(szMessage, nMsgLen), ignored_error);
-
-		std::cout << "서버에 보낸 메시지: " << szMessage << std::endl;
-
-		std::array<char, 128> buf;
-
-		// buf.assign(0); deprecated
-		buf.fill(0);
-
-		boost::system::error_code error;
-
-		size_t len = socket.read_some(boost::asio::buffer(buf), error);
-
-		if (error)
+	// io_context.run()을 호출하면
+	// 등록된 비동기 작업이 있는 동안 스레드가 블록되기 떄문에
+	// 채팅은 별도 스레드에서 진행
+	// 람다 캡쳐 : io_context와 client를 참조로 캡쳐
+	std::thread input_thread([&]()
 		{
-			if (error == boost::asio::error::eof)
+			for (;;)
 			{
-				std::cout << "서버와 연결이 끊어졌습니다" << std::endl;
+				std::shared_ptr<std::string> line = std::make_shared<std::string>();
+				std::getline(std::cin, *line);
+				if (*line == "/quit") break;
+
+				// shared_ptr를 람다 안으로 캡쳐해서 send_message 호출 시 생명주기 유지
+				client.send_message(line);
 			}
-			else
-			{
-				std::cout << "error No: " << error.value() << " error Message: " << error.message().c_str() << std::endl;
-			}
+			io_context.stop();
+		});
 
-			break;
-		}
+	// 메인 스레드에서 송수신 이벤트 처리
+	io_context.run();
 
-		std::cout << "서버로부터 받은 메시지: " << &buf[0] << std::endl;
-	}
-
-	if (socket.is_open())
-	{
-		socket.close();
-	}
-
-	getchar();
-
+	input_thread.join();
 	return 0;
 }
