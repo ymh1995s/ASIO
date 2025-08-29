@@ -8,7 +8,7 @@ using namespace std;
 
 class Server;
 
-class Session
+class Session : public std::enable_shared_from_this<Session>
 {
 public:
 	Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID);

@@ -34,5 +34,6 @@ private:
 	atomic<int> sessionNo; // 이번 세션에게 부여할 번호
 
 public:
+	// TODO :  RegisterSession, CloseSession, Broadcast 등에서의 스레드 세이프 필요
 	map<int, shared_ptr<Session>> sessionList;
 };

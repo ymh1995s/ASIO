@@ -26,7 +26,7 @@ void SessionManager::RegisterSession(shared_ptr<Session> pSession)
 
 bool SessionManager::CloseSession(int no)
 {
-	sessionList[no] = nullptr;
+	sessionList.erase(no);
 	return true;
 }
 

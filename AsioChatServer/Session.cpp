@@ -29,7 +29,7 @@ void Session::PostReceive()
 	m_Socket.async_read_some
 	(
 		boost::asio::buffer(m_recvBuffer),
-		boost::bind(&Session::HandleReceive, this,
+		boost::bind(&Session::HandleReceive, shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred)
 	);
