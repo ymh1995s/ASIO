@@ -20,8 +20,13 @@ public:
 	~SessionManager();
 
 	shared_ptr<Session> CreateSession();
+	void RegisterSession(shared_ptr<Session> pSession); // 실제 관리 대상으로 등록 (sessionList)
 	bool CloseSession(int no);
 	shared_ptr<Session> GetSession(int no);
+
+public:
+	// 세션 정보를 매니저가 들고 있으니까 여기서 브로드캐스트 하는게 맞겠지?
+	void Broadcast(char* buffer, int nSize);
 
 private:
 	boost::asio::io_context& m_ioContext;

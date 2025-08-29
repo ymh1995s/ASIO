@@ -47,6 +47,7 @@ void Server::handle_accept(shared_ptr<Session> pSession, const boost::system::er
 	{
 		std::cout << "클라이언트 접속 성공. SessionID: "<< pSession->GetSessionID()<<endl;
 
+		sessionManager->RegisterSession(pSession);
 		pSession->Init();
 		pSession->PostReceive();
 

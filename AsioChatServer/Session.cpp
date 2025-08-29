@@ -49,7 +49,6 @@ void Session::PostSend(char* buffer, int nSize)
 
 		m_isSending = true;
 	}
-	
 
 	Send();
 }
@@ -87,14 +86,6 @@ void Session::Send()
 	);
 }
 
-void Session::Broadcase()
-{
-	for (auto s : m_pServer->sessionManager->sessionList)
-	{
-
-	}
-}
-
 void Session::HandleSend(const boost::system::error_code& error, int bytes_transferred)
 {
 	if (!error)
@@ -123,10 +114,11 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 	if (!error)
 	{
 		// TODO : 현재는 m_recvBuffer가 있으나 Buffer클래스에서 조립해서 사용하게 할거임
-		cout << " 무언가 수신했습니다 \n";
+		cout << " 데이터 수신 \n";
 
 		// TODO 조립
-		PostSend(m_recvBuffer, bytes_transferred);
+		//PostSend(m_recvBuffer, bytes_transferred);
+		m_pServer->sessionManager->Broadcast(m_recvBuffer, bytes_transferred);
 
 		PostReceive();
 	}
