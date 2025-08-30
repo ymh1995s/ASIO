@@ -4,15 +4,15 @@
 #include "PacketManager.h"
 
 Session::Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID)
-	: m_Socket(io_context)
-	, m_pServer(pServer)
-	, m_sessionID(sessionID)
+	: socket(io_context)
+	, server(pServer)
+	, sessionID(sessionID)
 {
 }
 
 Session::~Session()
 {
-	cout << m_sessionID << "번 클라이언트는 안전하게 해제 되었습니다.(스마트 포인터 정상 작동)" << endl;
+	cout << sessionID << "번 클라이언트는 안전하게 해제 되었습니다.(스마트 포인터 정상 작동)" << endl;
 }
 
 void Session::Init()
@@ -28,7 +28,7 @@ void Session::PostReceive()
 		// 고정 길이 패킷에 유용하지만, 부분 데이터도 빨리 처리해야 하는 경우엔 비효율적일 수 있음
 		// 단, 헤더+바디로 이미 길이가 정해져 있으면 사용할 순 있겠지
 	// IOCP의 Async_Receive 등록과 같은 기능
-	m_Socket.async_read_some
+	socket.async_read_some
 	(
 		boost::asio::buffer(packetManager->GetRecvBuffer(), packetManager->GetRecvBufferSize()),
 		boost::bind(&Session::HandleReceive, shared_from_this(),
@@ -40,16 +40,16 @@ void Session::PostReceive()
 void Session::PostSend(char* buffer, int nSize)
 {
 	{
-		std::lock_guard<mutex> lock(m_lock);
+		std::lock_guard<mutex> _lock(lock);
 
-		m_sendQueue.push(make_pair(buffer, nSize));
+		sendQueue.push(make_pair(buffer, nSize));
 
 		// 이미 보내는 중이면, 큐에 넣기만 한다.
 		// TODO : 큐에 넣는 곳에 병목이 생기진 않을까?
-		if (m_isSending)
+		if (isSending)
 			return;
 
-		m_isSending = true;
+		isSending = true;
 	}
 
 	Send();
@@ -65,23 +65,23 @@ void Session::Send()
 
 	// scateer - gather : 큐에있는 모든 데이터를 모아서 한 번에 보냄
 	{
-		std::lock_guard<mutex> lock(m_lock);
+		std::lock_guard<mutex> _lock(lock);
 
-		if (m_sendQueue.empty())
+		if (sendQueue.empty())
 		{
-			m_isSending = false;
+			isSending = false;
 			return;
 		}
 
-		while (!m_sendQueue.empty())
+		while (!sendQueue.empty())
 		{
-			auto& front = m_sendQueue.front();
+			auto& front = sendQueue.front();
 			buffers.push_back(boost::asio::buffer(front.first, front.second));
-			m_sendQueue.pop();
+			sendQueue.pop();
 		}
 	}
 
-	boost::asio::async_write(m_Socket, buffers,
+	boost::asio::async_write(socket, buffers,
 		boost::bind(&Session::HandleSend, this,
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred)
@@ -105,9 +105,9 @@ void Session::HandleSend(const boost::system::error_code& error, int bytes_trans
 			std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 		}
 
-		if (auto server = m_pServer.lock())
+		if (auto s = server.lock())
 		{
-			server->sessionManager->CloseSession(m_sessionID);
+			s->sessionManager->CloseSession(sessionID);
 		}
 		else
 		{
@@ -119,7 +119,7 @@ void Session::HandleSend(const boost::system::error_code& error, int bytes_trans
 
 void Session::HandleReceive(const boost::system::error_code& error, int bytes_transferred)
 {
-	if (m_bClosed) return; // 이미 종료된 세션이면 무시
+	if (isClosed) return; // 이미 종료된 세션이면 무시
 	if (!error)
 	{
 		// TODO : 현재는 m_recvBuffer가 있으나 Buffer클래스에서 조립해서 사용하게 할거임
@@ -127,9 +127,9 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 
 		// TODO 조립
 		//PostSend(m_recvBuffer, bytes_transferred);
-		if (auto server = m_pServer.lock())
+		if (auto s = server.lock())
 		{
-			server->sessionManager->Broadcast(packetManager->GetRecvBuffer(), bytes_transferred);
+			s->sessionManager->Broadcast(packetManager->GetRecvBuffer(), bytes_transferred);
 		}
 		else
 		{
@@ -140,7 +140,7 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 	}
 	else
 	{
-		m_bClosed = true;  // 한 번만 처리
+		isClosed = true;  // 한 번만 처리
 		if (error == boost::asio::error::eof)
 		{
 			std::cout << "클라이언트와 연결이 끊어졌습니다" << std::endl;
@@ -150,9 +150,9 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 			std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 		}
 
-		if (auto server = m_pServer.lock())
+		if (auto s = server.lock())
 		{
-			server->sessionManager->CloseSession(m_sessionID);
+			s->sessionManager->CloseSession(sessionID);
 		}
 		else
 		{

@@ -2,8 +2,8 @@
 #include "SessionManager.h"
 
 Server::Server(boost::asio::io_context& io_context)
-	: m_ioContext(io_context),
-	m_acceptor(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 7777))
+	: ioContext(io_context),
+	acceptor(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 7777))
 {
 }
 
@@ -21,7 +21,7 @@ void Server::Init()
 void Server::CreateSessionManager()
 {
 	// shared_from_this()는 이미 관리되고 있는 객체, 즉 생성자 안에서는 호출할 수 없다.
-	sessionManager = make_shared<SessionManager>(m_ioContext, shared_from_this());
+	sessionManager = make_shared<SessionManager>(ioContext, shared_from_this());
 }
 
 bool Server::PostAccept()
@@ -30,7 +30,7 @@ bool Server::PostAccept()
 	shared_ptr<Session> pSession = sessionManager->CreateSession();
 
 	// async_accept(클라에 할당할 소켓 클래스, 접속이 완료됐을 때 콜백 함수)
-	m_acceptor.async_accept(pSession->Socket(),
+	acceptor.async_accept(pSession->Socket(),
 		// bind(bind할 함수, bind할 함수의 주인, bind할 함수의 파라미터 1, 파라미터2...)
 		boost::bind(&Server::handle_accept,
 			this,

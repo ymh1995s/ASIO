@@ -20,8 +20,8 @@ public:
 	void PostSend(char* buffer, int nSize);
 
 	// Heleper
-	int GetSessionID() { return m_sessionID; };
-	boost::asio::ip::tcp::socket& Socket() { return m_Socket; }
+	int GetSessionID() { return sessionID; };
+	boost::asio::ip::tcp::socket& Socket() { return socket; }
 
 private:
 	void HandleReceive(const boost::system::error_code& error, int bytes_transferred);
@@ -31,18 +31,18 @@ public:
 	void Send();
 
 private:
-	boost::asio::ip::tcp::socket m_Socket;
-	weak_ptr<Server> m_pServer;
+	boost::asio::ip::tcp::socket socket;
+	weak_ptr<Server> server;
 	shared_ptr<class PacketManager> packetManager;
 
-	int m_sessionID;
+	int sessionID;
 
 public:
 	//char m_recvBuffer[1024];
-	queue<pair<char*, int>> m_sendQueue; // TODO 스마트포인터로 관리 
-	atomic<bool> m_isSending = false;
+	queue<pair<char*, int>> sendQueue; // TODO 스마트포인터로 관리 
+	atomic<bool> isSending = false;
 		
 private:
-	std::mutex m_lock;
-	bool m_bClosed = false;
+	std::mutex lock;
+	bool isClosed = false;
 };

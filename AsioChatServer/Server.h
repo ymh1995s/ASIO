@@ -25,7 +25,7 @@ private:
 	void handle_accept(shared_ptr<Session> pSession, const boost::system::error_code& error);
 	
 public:
-	boost::asio::io_context& m_ioContext; // 비동기 입출력을 위해 acceptor와 session에게 전달 
-	boost::asio::ip::tcp::acceptor m_acceptor; // 리스너 클래스 역할 (IOCP 서버의 Listener.h/cpp)
+	boost::asio::io_context& ioContext; // 비동기 입출력을 위해 acceptor와 session에게 전달 
+	boost::asio::ip::tcp::acceptor acceptor; // 리스너 클래스 역할 (IOCP 서버의 Listener.h/cpp)
 	shared_ptr<class SessionManager> sessionManager;
 };

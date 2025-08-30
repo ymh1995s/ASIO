@@ -13,9 +13,9 @@ class ChatClient
 {
 public:
 	ChatClient(boost::asio::io_context& io_context, tcp::endpoint& endpoint)
-		: m_socket(io_context)
+		: socket(io_context)
 	{
-		m_socket.async_connect(endpoint,
+		socket.async_connect(endpoint,
 			// this => 값으로 캡쳐 
 			[this](boost::system::error_code ec)
 			{
@@ -33,7 +33,7 @@ public:
 
 	void send_message(std::shared_ptr<std::string> msg)
 	{
-		boost::asio::async_write(m_socket, boost::asio::buffer(*msg),
+		boost::asio::async_write(socket, boost::asio::buffer(*msg),
 			[msg](boost::system::error_code ec, std::size_t /*length*/)
 			{
 				if (ec)
@@ -44,7 +44,7 @@ public:
 private:
 	void do_read()
 	{
-		m_socket.async_read_some(boost::asio::buffer(recvBuffer, 1024),
+		socket.async_read_some(boost::asio::buffer(recvBuffer, 1024),
 			[this](boost::system::error_code ec, std::size_t length)
 			{
 				if (!ec)
@@ -59,7 +59,7 @@ private:
 			});
 	}
 
-	tcp::socket m_socket;
+	tcp::socket socket;
 	char recvBuffer[1024];
 };
 
