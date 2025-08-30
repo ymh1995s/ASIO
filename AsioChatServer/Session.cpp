@@ -1,6 +1,7 @@
 ﻿#include "Session.h"
 #include "Server.h"
 #include "SessionManager.h"
+#include "PacketManager.h"
 
 Session::Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID)
 	: m_Socket(io_context)
@@ -16,6 +17,7 @@ Session::~Session()
 
 void Session::Init()
 {
+	packetManager = make_shared<PacketManager>();
 	PostReceive();
 }
 
@@ -28,7 +30,7 @@ void Session::PostReceive()
 	// IOCP의 Async_Receive 등록과 같은 기능
 	m_Socket.async_read_some
 	(
-		boost::asio::buffer(m_recvBuffer),
+		boost::asio::buffer(packetManager->GetRecvBuffer(), packetManager->GetRecvBufferSize()),
 		boost::bind(&Session::HandleReceive, shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred)
@@ -103,7 +105,14 @@ void Session::HandleSend(const boost::system::error_code& error, int bytes_trans
 			std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 		}
 
-		m_pServer->sessionManager->CloseSession(m_sessionID);
+		if (auto server = m_pServer.lock())
+		{
+			server->sessionManager->CloseSession(m_sessionID);
+		}
+		else
+		{
+			cout << " Weak Ptr이 null 반환 [서버 소멸] \n";
+		}
 	}
 }
 
@@ -118,7 +127,14 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 
 		// TODO 조립
 		//PostSend(m_recvBuffer, bytes_transferred);
-		m_pServer->sessionManager->Broadcast(m_recvBuffer, bytes_transferred);
+		if (auto server = m_pServer.lock())
+		{
+			server->sessionManager->Broadcast(packetManager->GetRecvBuffer(), bytes_transferred);
+		}
+		else
+		{
+			cout << " Weak Ptr이 null 반환 [서버 소멸] \n";
+		}
 
 		PostReceive();
 	}
@@ -134,6 +150,13 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 			std::cout << "error No: " << error.value() << " error Message: " << error.message() << std::endl;
 		}
 
-		m_pServer->sessionManager->CloseSession(m_sessionID);
+		if (auto server = m_pServer.lock())
+		{
+			server->sessionManager->CloseSession(m_sessionID);
+		}
+		else
+		{
+			cout << " Weak Ptr이 null 반환 [서버 소멸] \n";
+		}
 	}
 }

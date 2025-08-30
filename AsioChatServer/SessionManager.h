@@ -30,7 +30,7 @@ public:
 
 private:
 	boost::asio::io_context& m_ioContext;
-	shared_ptr<Server> serverSession;
+	shared_ptr<Server> serverSession; // TODO : To WeakPtr?
 	atomic<int> sessionNo; // 이번 세션에게 부여할 번호
 
 public:

@@ -32,11 +32,13 @@ public:
 
 private:
 	boost::asio::ip::tcp::socket m_Socket;
-	shared_ptr<Server> m_pServer;
+	weak_ptr<Server> m_pServer;
+	shared_ptr<class PacketManager> packetManager;
+
 	int m_sessionID;
 
 public:
-	char m_recvBuffer[1024];
+	//char m_recvBuffer[1024];
 	queue<pair<char*, int>> m_sendQueue; // TODO 스마트포인터로 관리 
 	atomic<bool> m_isSending = false;
 		
