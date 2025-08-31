@@ -8,14 +8,15 @@ class SendBuffer
 {
 public:
 	SendBuffer() {};
-	~SendBuffer() { cout << "SendBuffer가 안전하게 해제되었습니다 [스마트 포인터] \n"; };
 	SendBuffer(int size);
+	~SendBuffer() { cout << "SendBuffer가 안전하게 해제되었습니다 [스마트 포인터] \n"; };
 
-	void CopyData(const void* data, size_t len);
+
+	void CopyData(const void* data, int len);
 
 	char* GetBuffer() { return buffer.data(); }
 	int GetWriteSize() { return writeSize; }
-	int GetCapacity() { return buffer.size(); }
+	int GetBufferSize() { return buffer.size(); }
 
 private:
     vector<char> buffer;

@@ -49,7 +49,6 @@ void Server::handle_accept(shared_ptr<Session> pSession, const boost::system::er
 
 		sessionManager->RegisterSession(pSession);
 		pSession->Init();
-		pSession->PostReceive();
 
 		PostAccept();
 	}

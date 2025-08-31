@@ -4,7 +4,7 @@ SendBuffer::SendBuffer(int size = 1024)
 {
 }
 
-void SendBuffer::CopyData(const void* data, size_t len)
+void SendBuffer::CopyData(const void* data, int len)
 {
     std::memcpy(buffer.data(), data, len);
     writeSize = len;
