@@ -13,26 +13,26 @@ const int SERVER_PORT = 7777;
 
 struct PacketHeader
 {
-	uint16_t size;   
-	uint16_t id;     
+	int size;   
+	int id;
 };
 
 struct ChatMessage
 {
 	PacketHeader header;
-	std::string  body; 
+	string  body; 
 };
 
 class Packet
 {
 public:
-	static std::vector<char> MakeChatPacket(const std::string& msg)
+	static vector<char> MakeChatPacket(const string& msg)
 	{
 		PacketHeader header;
 		header.size = sizeof(PacketHeader) + msg.size();
 		header.id = 1; // 1 = 채팅
 
-		std::vector<char> buffer(header.size);
+		vector<char> buffer(header.size);
 		memcpy(buffer.data(), &header, sizeof(PacketHeader));
 		memcpy(buffer.data() + sizeof(PacketHeader), msg.data(), msg.size());
 
@@ -73,24 +73,26 @@ public:
 	//}
 
 	// 패킷을 의도적으로 나눠보내 서버에서 패킷이 바로 가는지 확인하기
-	void send_message(std::shared_ptr<std::vector<char>> packet)
+	void send_message(std::shared_ptr<vector<char>> packet)
 	{
 		int half_size = packet->size() / 2;
 
 		// 첫 절반 전송
 		boost::asio::async_write(socket, boost::asio::buffer(packet->data(), half_size),
-			[packet](boost::system::error_code ec, std::size_t /*length*/)
+			[packet](boost::system::error_code ec, size_t /*length*/)
 			{
 				if (ec)
-					std::cout << "첫 번째 전송 오류: " << ec.message() << "\n";
+					cout << "첫 번째 전송 오류: " << ec.message() << "\n";
 			});
+
+		this_thread::sleep_for(chrono::seconds(2));
 
 		// 두 번째 절반 전송
 		boost::asio::async_write(socket, boost::asio::buffer(packet->data() + half_size, packet->size() - half_size),
-			[packet](boost::system::error_code ec, std::size_t /*length*/)
+			[packet](boost::system::error_code ec, size_t /*length*/)
 			{
 				if (ec)
-					std::cout << "두 번째 전송 오류: " << ec.message() << "\n";
+					cout << "두 번째 전송 오류: " << ec.message() << "\n";
 			});
 	}
 
@@ -98,16 +100,16 @@ private:
 	void do_read()
 	{
 		socket.async_read_some(boost::asio::buffer(recvBuffer, 1024),
-			[this](boost::system::error_code ec, std::size_t length)
+			[this](boost::system::error_code ec, size_t length)
 			{
 				if (!ec)
 				{
-					std::cout << "[서버] " << std::string(recvBuffer, length) << "\n";
+					cout << "[서버] " << string(recvBuffer, length) << "\n";
 					do_read(); // 계속 읽기 등록
 				}
 				else
 				{
-					std::cout << "수신 오류: " << ec.message() << "\n";
+					cout << "수신 오류: " << ec.message() << "\n";
 				}
 			});
 	}
@@ -119,7 +121,7 @@ private:
 
 int main()
 {
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	this_thread::sleep_for(chrono::seconds(1));
 	boost::asio::io_context io_context;
 	boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(SERVER_IP), 7777);
 

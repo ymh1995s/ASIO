@@ -17,7 +17,7 @@ public:
 	void Init();
 
 	void PostReceive();
-	void PostSend(char* buffer, int size);
+	void PostSend(const char* buffer, int size);
 
 	// Heleper
 	int GetSessionID() { return sessionID; };

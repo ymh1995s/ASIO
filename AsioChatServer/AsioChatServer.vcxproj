@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Protocol.cpp" />
     <ClCompile Include="RecvBuffer.cpp" />
     <ClCompile Include="PacketManager.cpp" />
     <ClCompile Include="SendBuffer.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="SessionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Protocol.h" />
     <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="PacketManager.h" />
     <ClInclude Include="SendBuffer.h" />

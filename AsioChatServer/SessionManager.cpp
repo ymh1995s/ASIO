@@ -36,7 +36,7 @@ shared_ptr<Session> SessionManager::GetSession(int no)
 	return pSession;
 }
 
-void SessionManager::Broadcast(char* buffer, int nSize)
+void SessionManager::Broadcast(const char* buffer, int nSize)
 {
 	for (auto& s : sessionList)
 	{

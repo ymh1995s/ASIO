@@ -31,14 +31,15 @@ void Session::PostReceive()
 	// IOCP의 Async_Receive 등록과 같은 기능
 	socket.async_read_some
 	(
-		boost::asio::buffer(packetManager->GetRecvBuffer(), packetManager->GetRecvBufferSize()),
-		boost::bind(&Session::HandleReceive, shared_from_this(),
+		boost::asio::buffer(packetManager->GetWritePtr(), packetManager->GetWritableSize()),
+		boost::bind(&Session::HandleReceive, 
+			shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred)
 	);
 }
 
-void Session::PostSend(char* data, int size)
+void Session::PostSend(const char* data, int size)
 {
 	auto sendBuffer = make_shared<SendBuffer>(size);
 	sendBuffer->CopyData(data, size);
@@ -126,19 +127,29 @@ void Session::HandleReceive(const boost::system::error_code& error, int bytes_tr
 	if (isClosed) return; // 이미 종료된 세션이면 무시
 	if (!error)
 	{
-		// TODO : 현재는 m_recvBuffer가 있으나 Buffer클래스에서 조립해서 사용하게 할거임
 		cout << " 데이터 수신 \n";
 
-		// TODO 조립
-		//PostSend(m_recvBuffer, bytes_transferred);
-		if (auto s = server.lock())
-		{
-			s->sessionManager->Broadcast(packetManager->GetRecvBuffer(), bytes_transferred);
-		}
-		else
-		{
-			cout << " Weak Ptr이 null 반환 [서버 소멸] \n";
-		}
+		packetManager->HasWritten(bytes_transferred);
+
+		// 2. 패킷 조립 시도
+		int packetCount = packetManager->ProcessPackets(
+			[this](const char* data, int size) 
+			{
+				if (auto s = server.lock())
+				{
+					s->sessionManager->Broadcast(data, size);
+				}
+			}
+		);
+
+		//if (auto s = server.lock())
+		//{
+		//	s->sessionManager->Broadcast(packetManager->GetRecvBuffer(), bytes_transferred);
+		//}
+		//else
+		//{
+		//	cout << " Weak Ptr이 null 반환 [서버 소멸] \n";
+		//}
 
 		PostReceive();
 	}

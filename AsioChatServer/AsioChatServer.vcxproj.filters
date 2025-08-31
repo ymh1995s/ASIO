@@ -11,6 +11,9 @@
     <Filter Include="Buffer">
       <UniqueIdentifier>{727abbc1-d9a7-4091-b7ba-9e1b7268ad4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ETC">
+      <UniqueIdentifier>{9117f34f-047b-43e3-a997-c57ab8f2381a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -34,6 +37,9 @@
     <ClCompile Include="SendBuffer.cpp">
       <Filter>Buffer</Filter>
     </ClCompile>
+    <ClCompile Include="Protocol.cpp">
+      <Filter>ETC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -53,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="SendBuffer.h">
       <Filter>Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h">
+      <Filter>ETC</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

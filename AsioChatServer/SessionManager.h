@@ -26,7 +26,7 @@ public:
 
 public:
 	// 세션 정보를 매니저가 들고 있으니까 여기서 브로드캐스트 하는게 맞겠지?
-	void Broadcast(char* buffer, int nSize);
+	void Broadcast(const char* buffer, int nSize);
 
 private:
 	boost::asio::io_context& ioContext;
