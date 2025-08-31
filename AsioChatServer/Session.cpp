@@ -2,6 +2,7 @@
 #include "Server.h"
 #include "SessionManager.h"
 #include "PacketManager.h"
+#include "SendBuffer.h"
 
 Session::Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID)
 	: socket(io_context)
@@ -37,12 +38,15 @@ void Session::PostReceive()
 	);
 }
 
-void Session::PostSend(char* buffer, int nSize)
+void Session::PostSend(char* data, int size)
 {
+	auto sendBuffer = make_shared<SendBuffer>(size);
+	sendBuffer->CopyData(data, size);
+
 	{
 		std::lock_guard<mutex> _lock(lock);
 
-		sendQueue.push(make_pair(buffer, nSize));
+		sendQueue.push(sendBuffer);
 
 		// 이미 보내는 중이면, 큐에 넣기만 한다.
 		// TODO : 큐에 넣는 곳에 병목이 생기진 않을까?
@@ -75,8 +79,8 @@ void Session::Send()
 
 		while (!sendQueue.empty())
 		{
-			auto& front = sendQueue.front();
-			buffers.push_back(boost::asio::buffer(front.first, front.second));
+			shared_ptr<SendBuffer>& front = sendQueue.front();
+			buffers.push_back(boost::asio::buffer(front->GetBuffer(), front->GetWriteSize()));
 			sendQueue.pop();
 		}
 	}

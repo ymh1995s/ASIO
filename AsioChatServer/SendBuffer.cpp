@@ -1,5 +1,11 @@
 ﻿#include "SendBuffer.h"
-
-SendBuffer::SendBuffer()
+SendBuffer::SendBuffer(int size = 1024)
+    : buffer(size), writeSize(0)
 {
+}
+
+void SendBuffer::CopyData(const void* data, size_t len)
+{
+    std::memcpy(buffer.data(), data, len);
+    writeSize = len;
 }

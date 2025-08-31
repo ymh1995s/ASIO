@@ -1,16 +1,21 @@
 ﻿#pragma once
+#include "vector"
+using namespace std;
+
 class SendBuffer
+	// TODO TLS나 메모리풀링 같은 최적화 기법 적용
 {
 public:
-	SendBuffer();
+	SendBuffer() {};
+	SendBuffer(int size);
 
-	char* GetBuffer() { return buffer; }
-	int GetBufferSize() { return 1024; } // TODO 하드코딩 삭제
+	void CopyData(const void* data, size_t len);
 
-	void Read();
-	void Write();
+	char* GetBuffer() { return buffer.data(); }
+	int GetWriteSize() { return writeSize; }
+	int GetCapacity() { return buffer.size(); }
 
 private:
-	char buffer[1024]; // or 동적할당?
+    vector<char> buffer;
+    int writeSize;
 };
-

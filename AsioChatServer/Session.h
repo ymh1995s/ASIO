@@ -17,7 +17,7 @@ public:
 	void Init();
 
 	void PostReceive();
-	void PostSend(char* buffer, int nSize);
+	void PostSend(char* buffer, int size);
 
 	// Heleper
 	int GetSessionID() { return sessionID; };
@@ -39,7 +39,7 @@ private:
 
 public:
 	//char m_recvBuffer[1024];
-	queue<pair<char*, int>> sendQueue; // TODO 스마트포인터로 관리 
+	std::queue<shared_ptr<class SendBuffer>> sendQueue;
 	atomic<bool> isSending = false;
 		
 private:
