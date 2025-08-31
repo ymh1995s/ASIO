@@ -4,10 +4,41 @@
 #include <thread>
 #include <chrono>
 
+using namespace std;
+
 using boost::asio::ip::tcp;
 
 const char SERVER_IP[] = "127.0.0.1";
 const int SERVER_PORT = 7777;
+
+struct PacketHeader
+{
+	uint16_t size;   
+	uint16_t id;     
+};
+
+struct ChatMessage
+{
+	PacketHeader header;
+	std::string  body; 
+};
+
+class Packet
+{
+public:
+	static std::vector<char> MakeChatPacket(const std::string& msg)
+	{
+		PacketHeader header;
+		header.size = sizeof(PacketHeader) + msg.size();
+		header.id = 1; // 1 = 채팅
+
+		std::vector<char> buffer(header.size);
+		memcpy(buffer.data(), &header, sizeof(PacketHeader));
+		memcpy(buffer.data() + sizeof(PacketHeader), msg.data(), msg.size());
+
+		return buffer;
+	}
+};
 
 class ChatClient
 {
@@ -31,13 +62,35 @@ public:
 			});
 	}
 
-	void send_message(std::shared_ptr<std::string> msg)
+	//void send_message(std::shared_ptr<std::vector<char>> packet)
+	//{
+	//	boost::asio::async_write(socket, boost::asio::buffer(*packet),
+	//		[packet](boost::system::error_code ec, std::size_t /*length*/)
+	//		{
+	//			if (ec)
+	//				std::cout << "송신 오류: " << ec.message() << "\n";
+	//		});
+	//}
+
+	// 패킷을 의도적으로 나눠보내 서버에서 패킷이 바로 가는지 확인하기
+	void send_message(std::shared_ptr<std::vector<char>> packet)
 	{
-		boost::asio::async_write(socket, boost::asio::buffer(*msg),
-			[msg](boost::system::error_code ec, std::size_t /*length*/)
+		int half_size = packet->size() / 2;
+
+		// 첫 절반 전송
+		boost::asio::async_write(socket, boost::asio::buffer(packet->data(), half_size),
+			[packet](boost::system::error_code ec, std::size_t /*length*/)
 			{
 				if (ec)
-					std::cout << "송신 오류: " << ec.message() << "\n";
+					std::cout << "첫 번째 전송 오류: " << ec.message() << "\n";
+			});
+
+		// 두 번째 절반 전송
+		boost::asio::async_write(socket, boost::asio::buffer(packet->data() + half_size, packet->size() - half_size),
+			[packet](boost::system::error_code ec, std::size_t /*length*/)
+			{
+				if (ec)
+					std::cout << "두 번째 전송 오류: " << ec.message() << "\n";
 			});
 	}
 
@@ -80,12 +133,13 @@ int main()
 		{
 			for (;;)
 			{
-				std::shared_ptr<std::string> line = std::make_shared<std::string>();
-				std::getline(std::cin, *line);
-				if (*line == "/quit") break;
+				std::string line;
+				std::getline(std::cin, line);
+				if (line == "/quit") break;
 
-				// shared_ptr를 람다 안으로 캡쳐해서 send_message 호출 시 생명주기 유지
-				client.send_message(line);
+				vector<char> rawPacket = Packet::MakeChatPacket(line);
+				shared_ptr<vector<char>> packet = make_shared<vector<char>>(rawPacket);
+				client.send_message(packet);
 			}
 			io_context.stop();
 		});
