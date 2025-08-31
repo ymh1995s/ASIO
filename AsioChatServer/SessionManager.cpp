@@ -38,7 +38,7 @@ shared_ptr<Session> SessionManager::GetSession(int no)
 
 void SessionManager::Broadcast(char* buffer, int nSize)
 {
-	for (auto s : sessionList)
+	for (auto& s : sessionList)
 	{
 		s.second->PostSend(buffer, nSize);
 	}

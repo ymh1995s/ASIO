@@ -3,5 +3,4 @@
 PacketManager::PacketManager()
 {
     recvBuffer = make_shared<RecvBuffer>();
-    sendBuffer = make_shared<SendBuffer>();
 }
