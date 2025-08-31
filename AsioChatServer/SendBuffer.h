@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "vector"
+#include <iostream>
 using namespace std;
 
 class SendBuffer
@@ -7,6 +8,7 @@ class SendBuffer
 {
 public:
 	SendBuffer() {};
+	~SendBuffer() { cout << "SendBuffer가 안전하게 해제되었습니다 [스마트 포인터] \n"; };
 	SendBuffer(int size);
 
 	void CopyData(const void* data, size_t len);
