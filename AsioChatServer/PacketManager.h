@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Session.h"
+
 #include "RecvBuffer.h"
 #include "SendBuffer.h"
 #include "Protocol.h"

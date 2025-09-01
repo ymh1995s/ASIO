@@ -1,15 +1,5 @@
 ﻿#pragma once
 
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <algorithm>
-#include <string>
-#include <map>
-#include <vector>
-
-#include "Session.h"
-
 using namespace std;
 class Session;
 

@@ -1,4 +1,6 @@
-﻿#include "RecvBuffer.h"
+﻿#include "pch.h"
+
+#include "RecvBuffer.h"
 
 RecvBuffer::RecvBuffer(int bufferSize) : _bufferSize(bufferSize)
 {

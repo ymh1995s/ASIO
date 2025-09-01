@@ -1,4 +1,6 @@
-﻿#include "Session.h"
+﻿#include "pch.h"
+
+#include "Session.h"
 #include "Server.h"
 #include "SessionManager.h"
 #include "PacketManager.h"

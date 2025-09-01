@@ -40,6 +40,9 @@
     <ClCompile Include="Protocol.cpp">
       <Filter>ETC</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>ETC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -61,6 +64,9 @@
       <Filter>Buffer</Filter>
     </ClInclude>
     <ClInclude Include="Protocol.h">
+      <Filter>ETC</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
       <Filter>ETC</Filter>
     </ClInclude>
   </ItemGroup>

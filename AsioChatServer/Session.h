@@ -1,17 +1,10 @@
 ﻿#pragma once
-#include <queue>
-
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-
-using namespace std;
-
 class Server;
 
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-	Session(boost::asio::io_context& io_context, shared_ptr<Server> pServer, int sessionID);
+	Session(boost::asio::io_context& io_context, std::shared_ptr<Server> pServer, int sessionID);
 	~Session();
 
 	void Init();
@@ -32,15 +25,15 @@ public:
 
 private:
 	boost::asio::ip::tcp::socket socket;
-	weak_ptr<Server> server;
-	shared_ptr<class PacketManager> packetManager;
+	std::weak_ptr<Server> server;
+	std::shared_ptr<class PacketManager> packetManager;
 
 	int sessionID;
 
 public:
 	//char m_recvBuffer[1024];
-	std::queue<shared_ptr<class SendBuffer>> sendQueue;
-	atomic<bool> isSending = false;
+	std::queue<std::shared_ptr<class SendBuffer>> sendQueue;
+	std::atomic<bool> isSending = false;
 		
 private:
 	std::mutex lock;

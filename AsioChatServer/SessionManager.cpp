@@ -1,4 +1,8 @@
-﻿#include "SessionManager.h"
+﻿#include "pch.h"
+
+#include "Server.h"
+#include "Session.h"
+#include "SessionManager.h"
 
 SessionManager::SessionManager(boost::asio::io_context& io_context, shared_ptr<Server> pServer)
 	: ioContext(io_context), serverSession(pServer)
